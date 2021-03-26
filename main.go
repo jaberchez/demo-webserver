@@ -60,15 +60,40 @@ tr:nth-child(even) {background-color: #f2f2f2;}
   `
 
 	for _, k := range keys {
+		versionVariable := false
+
 		result += "<tr>"
-		result += "<td>" + k + "</td>"
+
+		if k == "DEMO_WEBSERVER_VERSION" {
+			versionVariable = true
+		}
+
+		//result += "<td>" + k + "</td>"
+		result += "<td>"
+
+		if versionVariable {
+			result += "<b>" + k + "</b>"
+		} else {
+			result += k
+		}
+
+		result += "</td>"
 
 		if len(data[k]) >= trunc {
 			// Truncate the value
 			val := data[k]
-			result += "<td>" + val[:trunc] + "...</td>"
+
+			if versionVariable {
+				result += "<td><b>" + val[:trunc] + "...</b></td>"
+			} else {
+				result += "<td>" + val[:trunc] + "...</td>"
+			}
 		} else {
-			result += "<td>" + data[k] + "</td>"
+			if versionVariable {
+				result += "<td><b>" + data[k] + "</b></td>"
+			} else {
+				result += "<td>" + data[k] + "</td>"
+			}
 		}
 
 		result += "</tr>"

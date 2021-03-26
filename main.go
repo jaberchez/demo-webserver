@@ -45,8 +45,13 @@ func homePage(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, result)
 }
 
+func healthCheck(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprintf(w, "OK")
+}
+
 func main() {
 	http.HandleFunc("/", homePage)
+	http.HandleFunc("/health", healthCheck)
 
 	log.Println("Server listening or port 8080")
 	log.Fatal(http.ListenAndServe(":8080", nil))

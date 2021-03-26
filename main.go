@@ -5,24 +5,19 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"regexp"
 	"sort"
 	"strings"
 )
 
 func homePage(w http.ResponseWriter, r *http.Request) {
+	trunc := 80
 	data := make(map[string]string)
 	var result string
 
-	// Get environment variables stargs with DEMO_WEBSERVER_
-	re := regexp.MustCompile(`^DEMO_WEBSERVER_`)
-
+	// Get environment variables
 	for _, e := range os.Environ() {
-		if re.MatchString(e) {
-			pair := strings.SplitN(e, "=", 2)
-			data[pair[0]] = pair[1]
-		}
-
+		pair := strings.SplitN(e, "=", 2)
+		data[pair[0]] = pair[1]
 	}
 
 	if len(data) == 0 {
@@ -38,9 +33,48 @@ func homePage(w http.ResponseWriter, r *http.Request) {
 
 	sort.Strings(keys)
 
+	result = `
+<html>
+<head>
+<style>
+table, th, td {
+  border: 1px solid black;
+  border-collapse: collapse;
+}
+
+th, td {
+	padding: 10px;
+ }
+
+tr:nth-child(even) {background-color: #f2f2f2;}
+</style>
+</head>
+<body>
+
+<h1>Environment Variables</h1>
+<table>
+<tr>
+<th>Name</th>
+<th>Value</th>
+</tr>
+  `
+
 	for _, k := range keys {
-		result += "<h1>" + k + ": " + data[k] + "</h1>"
+		result += "<tr>"
+		result += "<td>" + k + "</td>"
+
+		if len(data[k]) >= trunc {
+			// Truncate the value
+			val := data[k]
+			result += "<td>" + val[:trunc] + "...</td>"
+		} else {
+			result += "<td>" + data[k] + "</td>"
+		}
+
+		result += "</tr>"
 	}
+
+	result += "</table></html>"
 
 	fmt.Fprintf(w, result)
 }
